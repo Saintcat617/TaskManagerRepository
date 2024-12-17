@@ -1,0 +1,31 @@
+﻿@page "/tasks"
+@layout MainLayout
+
+
+@using TaskManager.Web.Services
+@inject TaskService TaskService
+
+<h3>Lista de Tareas</h3>
+
+@if (tasks == null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <ul>
+        @foreach (var task in tasks)
+        {
+            <li>@task.Titulo - @task.Estado</li>
+        }
+    </ul>
+}
+
+@code {
+    private List<Tarea> tasks;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tasks = await TaskService.GetTasks();
+    }
+}

@@ -1,0 +1,72 @@
+﻿@page "/register"
+@inject HttpClient Http
+
+<h3>Registrarse</h3>
+
+<EditForm Model="user" OnValidSubmit="RegisterUser">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Nombre</label>
+        <InputText @bind-Value="user.Nombre" class="form-control" />
+    </div>
+    <div>
+        <label>Correo</label>
+        <InputText @bind-Value="user.Correo" class="form-control" type="email" />
+    </div>
+    <div>
+        <label>Contraseña</label>
+        <InputText @bind-Value="user.Contraseña" class="form-control" type="password" />
+    </div>
+    <div>
+        <label>Rol</label>
+        <InputText @bind-Value="user.Rol" class="form-control" />
+    </div>
+    <button class="btn btn-primary" type="submit">Registrar</button>
+</EditForm>
+
+@if (successMessage != null)
+{
+    <p class="text-success">@successMessage</p>
+}
+@if (errorMessage != null)
+{
+    <p class="text-danger">@errorMessage</p>
+}
+
+@code {
+    private Usuario user = new Usuario();
+    private string? successMessage;
+    private string? errorMessage;
+
+    private async Task RegisterUser()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("https://localhost:7092/api/auth/register", user);
+            if (response.IsSuccessStatusCode)
+            {
+                successMessage = "Usuario registrado con éxito.";
+                errorMessage = null;
+            }
+            else
+            {
+                errorMessage = "Error al registrar el usuario.";
+                successMessage = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error: " + ex.Message;
+        }
+    }
+
+    private class Usuario
+    {
+        public string Nombre { get; set; }
+        public string Correo { get; set; }
+        public string Contraseña { get; set; }
+        public string Rol { get; set; }
+    }
+}

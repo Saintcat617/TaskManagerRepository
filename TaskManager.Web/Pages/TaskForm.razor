@@ -1,0 +1,99 @@
+﻿@page "/taskform"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<h3>@(task.Id == 0 ? "Crear Tarea" : "Editar Tarea")</h3>
+
+<EditForm Model="task" OnValidSubmit="SaveTask">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Título</label>
+        <InputText @bind="task.Titulo" class="form-control" />
+    </div>
+    <div>
+        <label>Descripción</label>
+        <InputText @bind="task.Descripcion" class="form-control" />
+    </div>
+    <div>
+        <label>Estado</label>
+        <select @bind="task.Estado" class="form-control">
+            <option value="Pendiente">Pendiente</option>
+            <option value="En Progreso">En Progreso</option>
+            <option value="Completada">Completada</option>
+        </select>
+    </div>
+
+    <button class="btn btn-primary" type="submit">@buttonLabel</button>
+</EditForm>
+
+@if (errorMessage != null)
+{
+    <p class="text-danger">@errorMessage</p>
+}
+
+@code {
+    private Tarea task = new Tarea();
+    private string buttonLabel = "Guardar";
+    private string? errorMessage;
+
+    [Parameter]
+    public int? TaskId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (TaskId.HasValue && TaskId.Value > 0)
+        {
+            buttonLabel = "Actualizar";
+
+            var response = await Http.GetAsync($"api/tasks/{TaskId.Value}");
+            if (response.IsSuccessStatusCode)
+            {
+                task = await response.Content.ReadFromJsonAsync<Tarea>() ?? new Tarea();
+            }
+            else
+            {
+                errorMessage = "No se pudo cargar la tarea.";
+            }
+        }
+    }
+
+    private async Task SaveTask()
+    {
+        if (task.Id == 0)
+        {
+            var response = await Http.PostAsJsonAsync("api/tasks", task);
+            if (response.IsSuccessStatusCode)
+            {
+                Navigation.NavigateTo("/tasks");
+            }
+            else
+            {
+                errorMessage = "No se pudo crear la tarea.";
+            }
+        }
+        else
+        {
+            var response = await Http.PutAsJsonAsync($"api/tasks/{task.Id}", task);
+            if (response.IsSuccessStatusCode)
+            {
+                Navigation.NavigateTo("/tasks");
+            }
+            else
+            {
+                errorMessage = "No se pudo actualizar la tarea.";
+            }
+        }
+    }
+
+    private class Tarea
+    {
+        public int Id { get; set; }
+        public string Titulo { get; set; } = string.Empty;
+        public string Descripcion { get; set; } = string.Empty;
+        public string Estado { get; set; } = "Pendiente";
+        public DateTime FechaCreacion { get; set; } = DateTime.Now;
+        public DateTime FechaActualizacion { get; set; } = DateTime.Now;
+    }
+}

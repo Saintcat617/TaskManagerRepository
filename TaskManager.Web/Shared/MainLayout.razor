@@ -1,0 +1,55 @@
+﻿@inherits LayoutComponentBase
+
+<div class="main-layout">
+    <header>
+        <NavMenu />
+    </header>
+    <main>
+        @if (IsAuthenticated)
+        {
+            @Body
+        }
+        else
+        {
+            <p class="alert">Por favor, inicia sesión para continuar.</p>
+        }
+    </main>
+</div>
+
+<style>
+    .main-layout {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
+
+    header {
+        background-color: #343a40;
+        color: white;
+        padding: 10px;
+    }
+
+    main {
+        flex: 1;
+        padding: 20px;
+        background-color: #f8f9fa;
+    }
+
+    .alert {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+@code {
+    // Variables para manejar el estado de autenticación
+    private bool IsAuthenticated { get; set; }
+
+    protected override void OnInitialized()
+    {
+        // Lógica para verificar autenticación
+        // Esto podría ser reemplazado por un servicio de autenticación real
+        IsAuthenticated = true; // Simulación: Cambiar a 'false' para probar sin autenticación
+    }
+}
+
