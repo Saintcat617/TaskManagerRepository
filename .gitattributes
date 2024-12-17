@@ -1,2 +1,27 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+## .gitattributes
+
+Crea un archivo `.gitattributes` en la raíz del proyecto con el siguiente contenido:
+
+```gitattributes
+# Archivo .gitattributes para normalizar fin de línea y configuraciones básicas
+
+# Configuración de fin de línea para archivos de código
+*.cs text eol=lf
+*.cshtml text eol=lf
+*.razor text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+
+# Binarios
+*.dll binary
+*.exe binary
+*.png binary
+*.jpg binary
+*.gif binary
+
+# Evita cambios automáticos en dependencias
+!packages/**
+
+# Ignorar archivos de configuración local
+*.user diff=default
+*.suo diff=default
